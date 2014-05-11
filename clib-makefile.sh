@@ -50,7 +50,7 @@ LDFLAGS+='-o $(TARGET_DSOLIB) -shared $(TARGET_DSO).$(VERSION_MAJOR)'
 ## output usage
 usage () {
   {
-    echo "usage: clib-makefile [-hyidV]"
+    echo "usage: clib-makefile [-hydV]"
   } >&2
 }
 
@@ -153,8 +153,8 @@ appendf () {
 }
 
 ## intro
-echo " clib-makefile(1) v${CLIB_MAKEFILE_VERSION}"
-echo "-------------------------"
+echo "clib-makefile(1) v${CLIB_MAKEFILE_VERSION}"
+echo "------------------------"
 echo "Detected OS = '${OS}'"
 echo
 
@@ -229,15 +229,22 @@ if [ "0" == "${FORCE_DEFAULT}" ]; then
       esac
       ((++i))
     done
-}
+  }
 
-## CFLAGS
-hint "Define \`CFLAGS' environment variable for appending"
-prompt CFLAGS "Enter CFLAGS (${CFLAGS}): "
+  ## CFLAGS
+  hint "Define \`CFLAGS' environment variable for appending"
+  prompt CFLAGS "Enter CFLAGS (${CFLAGS}): "
 
-## LDFLAGS
-hint "Define \`LDFLAGS' environment variable for appending"
-prompt LDFLAGS "Enter LDFLAGS (${LDFLAGS}): "
+  ## LDFLAGS
+  hint "Define \`LDFLAGS' environment variable for appending"
+  prompt LDFLAGS "Enter LDFLAGS (${LDFLAGS}): "
+else
+  if [ "0" = "${FORCE_YES}" ]; then
+    prompt ANSWER "Use defaults? (no): "
+    if [ "y" != "${ANSWER:0:1}" ]; then
+      exit 1
+    fi
+  fi
 fi
 
 VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
@@ -378,4 +385,8 @@ ${TAB}rm -f \$(OBJS) \$(BIN) \$(TARGET_STATIC) \$(TARGET_DSO) \$(TARGET_DSOLIB) 
 .PHONY: \$(MAN_FILES) \$(TESTS) \$(BIN) test
 MAKEFILE
 
+FILE_PATH="$(cd $(dirname ${FILE}); pwd)/$(basename ${FILE})"
+
+echo
+echo "+ \`${FILE_PATH}'"
 exit $?
