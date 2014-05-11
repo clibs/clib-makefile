@@ -1,1 +1,6 @@
 test/Makefile
+test/foo
+test/*.so*
+test/libfoo.a
+test/src/foo.o
+test/test
