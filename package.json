@@ -1,6 +1,6 @@
 {
   "name": "clib-makefile",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repo": "jwerle/cilb-makefile",
   "description": "Interactively generate a `Makefile' for your C lib project with clibs in mind ",
   "keywords": ["clib", "util", "makefile"],
