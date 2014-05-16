@@ -30,8 +30,8 @@ opt PREFIX "/usr/local"
 HEADER_DIR="include/"
 
 ## man
-MAN_FILES="man/*.{1,2,3}"
-MAN_TPLS="man/*.md"
+MAN_FILES=""
+MAN_TPLS=""
 MAN1PREFIX="${PREFIX}/share/man1"
 MAN2PREFIX="${PREFIX}/share/man2"
 MAN3PREFIX="${PREFIX}/share/man3"
@@ -203,10 +203,10 @@ if [ "0" == "${FORCE_DEFAULT}" ]; then
   prompt MAN3PREFIX "Enter man3 path prefix (${MAN3PREFIX}): "
 
   ## man files
-  prompt MAN_FILES "Enter man file sources (${MAN_FILES}): "
+  prompt MAN_FILES "Enter man file sources: "
 
   ## man template files
-  prompt MAN_TPLS "Enter man template (markdown) files (${MAN_TPLS}): "
+  prompt MAN_TPLS "Enter man template (markdown) files: "
 
   ## binary name if applicable
   prompt BIN_NAME "Enter bin name if applicable (${BIN_NAME}): "
@@ -270,14 +270,18 @@ OBJS = ${OBJS}
 TESTS = ${TESTS}
 
 PREFIX ?= ${PREFIX}
-MAN1PREFIX ?= ${MAN1PREFIX}
-MAN2PREFIX ?= ${MAN2PREFIX}
-MAN3PREFIX ?= ${MAN3PREFIX}
-
-MAN_FILES = ${MAN_FILES}
-MAN_TPLS = ${MAN_TPLS}
-
 MAKEFILE
+
+if [ ! -z "${MAN_FILES}" ]; then
+  append "MAN_FILES ?= ${MAN_FILES}"
+  append "MAN1PREFIX ?= ${MAN1PREFIX}"
+  append "MAN2PREFIX ?= ${MAN2PREFIX}"
+  append "MAN3PREFIX ?= ${MAN3PREFIX}"
+fi
+
+if [ ! -z "${MAN_TPLS}" ]; then
+  append "MAN_TPLS ?= ${MAN_TPLS}"
+fi
 
 ## bin name
 if [ ! -z "${BIN_NAME}" ]; then
@@ -374,16 +378,28 @@ test: \$(TESTS)
 ${TAB} \$(CC) \$(OBJS) \$(@) \$(CFLAGS) -o \$(@:.c=)
 ${TAB} ./\$(@:.c=)
 
-\$(MAN_FILES): \$(MAN_TPLS)
-
-\$(MAN_TPLS):
-${TAB} curl -# -F page=@\$(@) -o \$(@:%.md=%) http://mantastic.herokuapp.com
-
-clean:
-${TAB}rm -f \$(OBJS) \$(BIN) \$(TARGET_STATIC) \$(TARGET_DSO) \$(TARGET_DSOLIB) *.so*
-
-.PHONY: \$(MAN_FILES) \$(TESTS) \$(BIN) test
 MAKEFILE
+
+if [ ! -z "${MAN_FILES}" ]; then
+  append "\$(MAN_FILES): \$(MAN_TPLS)"
+  append ""
+  append ".PHONY: \$(MAN_TPLS)"
+  append ""
+fi
+
+if [ ! -z "${MAN_TPLS}" ]; then
+  append "\$(MAN_TPLS):"
+  append "${TAB} curl -# -F page=@\$(@) -o \$(@:%.md=%) http://mantastic.herokuapp.com"
+  append ""
+  append ".PHONY: \$(MAN_TPLS)"
+  append ""
+fi
+
+append "clean:"
+append "${TAB}rm -f \$(OBJS) \$(BIN) \$(TARGET_STATIC) \$(TARGET_DSO) \$(TARGET_DSOLIB) *.so*"
+append ""
+
+append ".PHONY: \$(TESTS) \$(BIN) test"
 
 FILE_PATH="$(cd $(dirname ${FILE}); pwd)/$(basename ${FILE})"
 
